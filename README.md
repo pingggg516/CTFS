@@ -26,16 +26,15 @@ pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 -f https://download.py
 > Pixel Value: Class Name
 >>        0:  Background         
 >>        1:  Block        
->>        2:  Can            
->>        3:  Chain          
->>        4:  Drink-carton   
->>        5:  Hook           
->>        6:  Propeller      
->>        7:  Shampoo-bottle 
->>        8:  Standing-bottle
->>        9:  Tire           
->>        10: Valve         
->>        11: Wall   
+>>        2:  Circle Cage            
+>>        3:  Steel Frame          
+>>        4:  Concrete Column   
+>>        5:  Steel Plate          
+>>        6:  Pot      
+>>        7:  SquareCage
+>>        8:  Tire
+>>        9:  Underwater Robot           
+>>        10: Diver             
 * Make ensure the dataset structure is as follows:
 ```bash
 ├──$HOME/datasets/
