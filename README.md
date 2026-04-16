@@ -21,7 +21,7 @@ pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 -f https://download.py
     └── dinov2_large.pth
 ```
 ### Dataset
-* The FSSG dataset contains 3,761 forward-looking sonar images consisting of 11 targets(including background).Please download FSSG dataset here firstly, and modify your dataset path in configuration files.
+* The FSSG dataset contains 3,761 forward-looking sonar images consisting of 11 targets(including background).Please download FSSG dataset here firstly.
 * Class names and the corresponding pixel values in the labels are as follows-:
 ```bash
  Pixel Value: Class Name
@@ -49,7 +49,7 @@ pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 -f https://download.py
         ├── 0_frame_350.png
         ...
 ```
-
+Please modify your dataset path in configuration files.
 ## Usage
 
 
