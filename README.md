@@ -23,7 +23,8 @@ pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 -f https://download.py
 ### Dataset
 * The FSSG dataset contains 3,761 forward-looking sonar images consisting of 11 targets(including background).Please download FSSG dataset here firstly, and modify your dataset path in configuration files.
 * Class names and the corresponding pixel values in the labels are as follows-:
-> Pixel Value: Class Name
+```bash
+ Pixel Value: Class Name
 >>        0:  Background         
 >>        1:  Block        
 >>        2:  Circle Cage            
@@ -34,7 +35,8 @@ pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 -f https://download.py
 >>        7:  SquareCage
 >>        8:  Tire
 >>        9:  Underwater Robot           
->>        10: Diver             
+>>        10: Diver
+```
 * Make ensure the dataset structure is as follows:
 ```bash
 ├──$HOME/datasets/
