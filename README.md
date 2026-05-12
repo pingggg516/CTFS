@@ -59,6 +59,14 @@ Run the following command for training:
 python CTFS_train.py --config configs/CTFS.yaml --labeled-id-path splits/CTFS/<split>/labeled.txt --unlabeled-id-path splits/CTFS/<split>/unlabeled.txt --save-path ./exp/CFTS/<split>
 ```
 
+## Acknowledgements
+
+This project is based on [UniMatch-V2](https://github.com/LiheYoung/UniMatch-V2) and includes DINOv2-based backbone components.
+
+We thank the authors of the following open-source projects:
+- [UniMatch-V2](https://github.com/LiheYoung/UniMatch-V2)
+- [UniMatch](https://github.com/LiheYoung/UniMatch)
+- [DINOv2](https://github.com/facebookresearch/dinov2)
 
 
 
