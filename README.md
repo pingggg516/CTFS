@@ -2,9 +2,6 @@
 
 CTFS: Collaborative Teacher Framework for Forward-Looking Sonar Image Semantic Segmentation with Extremely Limited Labels.
 
-## Overview
-
-This repository contains the training code for CTFS on forward-looking sonar semantic segmentation.
 
 ## Installation
 
