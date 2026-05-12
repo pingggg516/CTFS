@@ -20,6 +20,9 @@ pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 -f https://download.py
     ├── dinov2_base.pth
     └── dinov2_large.pth
 ```
+Download the backbones you need and put them into the *pretrained* folder under the root derectory.
+
+
 ### Dataset
 * The FSSG dataset contains 3,761 forward-looking sonar images consisting of 11 targets(including background).Please download FSSG dataset here firstly.
 * Class names and the corresponding pixel values in the labels are as follows-:
@@ -51,6 +54,11 @@ pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 -f https://download.py
 ```
 Please modify your dataset path in configuration files.
 ## Usage
+Run the following command for training:
+```bash
+python CTFS_train.py --config configs/CTFS.yaml --labeled-id-path splits/CTFS/<split>/labeled.txt --unlabeled-id-path splits/CTFS/<split>/unlabeled.txt --save-path ./exp/CFTS/<split>
+```
+
 
 
 
