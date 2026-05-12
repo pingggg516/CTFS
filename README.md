@@ -49,6 +49,15 @@ Set the dataset root in `configs/CTFS.yaml`:
 data_root: /path/to/dataset_root
 ```
 
+All split list files in this project should use the same line format:
+
+```text
+Images/xxx.png Masks/xxx.png
+```
+
+The paths in each line should be relative to `data_root`.
+
+
 ### Class Definition
 * Class names and the corresponding pixel values in the labels are as follows:
 ```text
