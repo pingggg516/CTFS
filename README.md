@@ -56,7 +56,7 @@ Please modify your dataset path in configuration files.
 ## Usage
 Run the following command for training:
 ```bash
-python CTFS_train.py --config configs/CTFS.yaml --labeled-id-path splits/CTFS/<split>/labeled.txt --unlabeled-id-path splits/CTFS/<split>/unlabeled.txt --save-path ./exp/CFTS/<split>
+python CTFS_train.py --config configs/CTFS.yaml --labeled-id-path splits/CTFS/<split>/labeled.txt --unlabeled-id-path splits/CTFS/<split>/unlabeled.txt --save-path ./exp/CTFS/<split>
 ```
 
 ## Acknowledgements
