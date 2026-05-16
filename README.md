@@ -82,7 +82,7 @@ Run single-GPU training with:
 # --labeled-id-path: Fill in the file path
 # --unlabeled-id-path: Fill in the file path
 python CTFS_train.py \
-  --config configs/CTFS.yaml \
+  --config configs/FSSG.yaml \
   --labeled-id-path /path/to/labeled.txt \
   --unlabeled-id-path /path/to/unlabeled.txt \
   --save-path ./exp/CTFS/<experiment_name>
