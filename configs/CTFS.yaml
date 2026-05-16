@@ -1,5 +1,5 @@
 # arguments for dataset
-dataset: CTFS
+dataset: FSSG
 nclass: 11 
 crop_size: 518
 data_root:   #Fill in the dataset root path
