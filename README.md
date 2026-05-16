@@ -102,4 +102,15 @@ We thank the authors of the following open-source projects:
 - [UniMatch-V2](https://github.com/LiheYoung/UniMatch-V2)
 - [UniMatch](https://github.com/LiheYoung/UniMatch)
 
+## Citation
+
+If you find this project useful, please consider citing:
+```bash
+@article{guo2026ctfs,
+  title={CTFS: Collaborative Teacher Framework for Forward-Looking Sonar Image Semantic Segmentation with Extremely Limited Labels},
+  author={Guo, Ping and Li, Chengzhou and Meng, Guanchen and Jia, Qi and Liu, Jinyuan and Liu, Zhu and Liu, Yu and Luo, Zhongxuan and Fan, Xin},
+  journal={arXiv preprint arXiv:2603.21071},
+  year={2026}
+}
+```
 
