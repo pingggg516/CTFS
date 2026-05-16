@@ -54,5 +54,5 @@ CLASSES = {'pascal': ['background', 'aeroplane', 'bicycle', 'bird', 'boat', 'bot
                       'vase', 'traffic light', 'tray', 'ashcan', 'fan', 'pier', 'crt screen',
                       'plate', 'monitor', 'bulletin board', 'shower', 'radiator', 'glass',
                       'clock', 'flag'],
-             'CTFS': ['Background','Block','Circle Cage','Steel Frame','Concrete Column','Steel Plate', 'Pot', 'SquareCage', 'Tire', 'Underwater Robot','Diver'],
+             'FSSG': ['Background','Block','Circle Cage','Steel Frame','Concrete Column','Steel Plate', 'Pot', 'SquareCage', 'Tire', 'Underwater Robot','Diver'],
            }
