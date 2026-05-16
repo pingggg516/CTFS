@@ -1,6 +1,6 @@
 # modify these augments if you want to try other datasets, splits or methods
 # dataset: ['pascal', 'cityscapes', 'ade20k', 'coco']
-# method: ['CFTS_train', 'fixmatch', 'supervised']
+# method: ['CTFS_train', 'fixmatch', 'supervised']
 # exp: just for specifying the 'save_path'
 # split: ['92', '1_16', ...]. Please check directory './splits/$dataset' for concrete splits
 dataset='pascal'
