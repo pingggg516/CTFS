@@ -34,12 +34,12 @@ The dataset root should contain `Images/` and `Masks/` subdirectories.
 ```bash
 ├── /path/to/dataset_root/
     ├── Images
-    │   ├── 0_341.png
-    │   ├── 0_350.png
+    │   ├── 00001.png
+    │   ├── 00002.png
     │   └── ...
     └── Masks
-        ├── 0_341.png
-        ├── 0_350.png
+        ├── 00001.png
+        ├── 00002.png
         └── ...
 ```
 
