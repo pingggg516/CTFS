@@ -27,8 +27,7 @@ Download the required DINOv2 pretrained backbone and place it under the `pretrai
 ```
 
 ## FSSG Dataset
-The FSSG dataset contains 3,760 forward-looking sonar images consisting of 11 targets(including background).Please download FSSG dataset [Here]( https://pan.baidu.com/s/1x-lGasJIzrf_6kPrDGvHHw?pwd=0516 
-) firstly.
+The FSSG dataset contains 3,760 forward-looking sonar images consisting of 11 targets(including background).Please download FSSG dataset [Here](https://pan.baidu.com/s/1SC1ytQFPZBW7S7vJsSyEbg?pwd=0516) firstly.
 
 The dataset root should contain `Images/` and `Masks/` subdirectories.
 
