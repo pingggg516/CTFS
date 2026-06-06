@@ -27,7 +27,7 @@ Download the required DINOv2 pretrained backbone and place it under the `pretrai
 ```
 
 ## FSSG Dataset
-The FSSG dataset contains 3,760 forward-looking sonar images consisting of 11 targets(including background).Please download FSSG dataset [Here](https://pan.baidu.com/s/1SC1ytQFPZBW7S7vJsSyEbg?pwd=0516) firstly.
+The FSSG dataset contains 3,760 forward-looking sonar images consisting of 11 targets(including background).Please download FSSG dataset [Here](https://pan.baidu.com/s/1dDXZftu3BJe2Udm0fNxbBg?pwd=0516) firstly.
 
 The dataset root should contain `Images/` and `Masks/` subdirectories.
 
@@ -107,10 +107,11 @@ We thank the authors of the following open-source projects:
 
 If you find this project useful, please consider citing:
 ```bash
-@article{guo2026ctfs,
+@inproceedings{guo2026ctfs,
   title={CTFS: Collaborative Teacher Framework for Forward-Looking Sonar Image Semantic Segmentation with Extremely Limited Labels},
   author={Guo, Ping and Li, Chengzhou and Meng, Guanchen and Jia, Qi and Liu, Jinyuan and Liu, Zhu and Liu, Yu and Luo, Zhongxuan and Fan, Xin},
-  journal={arXiv preprint arXiv:2603.21071},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  pages={1660--1669},
   year={2026}
 }
 ```
