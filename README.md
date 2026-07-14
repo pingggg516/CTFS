@@ -43,7 +43,7 @@ The dataset root should contain `Images/` and `Masks/` subdirectories.
         └── ...
 ```
 
-Set the dataset root in `configs/CTFS.yaml`:
+Set the dataset root in `configs/FSSG.yaml`:
 
 ```yaml
 data_root: /path/to/dataset_root
