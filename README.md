@@ -95,13 +95,12 @@ python CTFS_train.py \
 
 ## Acknowledgements
 
-This project is based on [UniMatch-V2](https://github.com/LiheYoung/UniMatch-V2) and includes DINOv2-based backbone components, the source data for the FSSG dataset is provided by [RSOD](https://github.com/LICZ9/RSOD).
+This project is based on [UniMatch-V2](https://github.com/LiheYoung/UniMatch-V2) and includes DINOv2-based backbone components.
 
 We thank the authors of the following open-source projects:
 - [DINOv2](https://github.com/facebookresearch/dinov2)
 - [UniMatch-V2](https://github.com/LiheYoung/UniMatch-V2)
 - [UniMatch](https://github.com/LiheYoung/UniMatch)
-- [RSOD](https://github.com/LICZ9/RSOD)
 
 ## Citation
 
