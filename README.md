@@ -74,10 +74,9 @@ The paths in each line should be relative to `data_root`.
 10: Diver
 ```
 ### Usage Terms
-﻿
-The FSSG dataset is publicly available for **non-commercial use only**. No separate permission request is required for such use.
-﻿
-If you use this dataset, please cite our paper and **acknowledge this repository as the dataset source** in any resulting publications or research outputs.
+
+The FSSG dataset is publicly available for **non-commercial use only**. No separate permission request is required for such use.<br>
+If you use this dataset, please **cite our paper** and **acknowledge this repository as the dataset source** in any resulting publications or research outputs.
 
 ## Training
 
