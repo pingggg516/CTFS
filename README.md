@@ -95,7 +95,7 @@ python CTFS_train.py \
 
 ## Notes
 
-- Make sure `data_root` in `configs/CTFS.yaml` is a valid path.
+- Make sure `data_root` in `configs/FSSG.yaml` is a valid path.
 - Make sure the pretrained backbone file exists in `pretrained/`.
 
 ## Acknowledgements
