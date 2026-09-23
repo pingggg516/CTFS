@@ -459,7 +459,7 @@ Images/02158.png Masks/02158.png
 Images/02159.png Masks/02159.png
 Images/02169.png Masks/02169.png
 Images/02171.png Masks/02171.png
-Images/02172.png.baiduyun.p.downloading Masks/02172.png
+Images/02172.png Masks/02172.png
 Images/02173.png Masks/02173.png
 Images/02178.png Masks/02178.png
 Images/02179.png Masks/02179.png
