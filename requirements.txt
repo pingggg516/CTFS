@@ -10,3 +10,7 @@ einops
 h5py
 torch
 torchvision
+numpy==1.23.5
+psutil==7.2.1
+pynvml==13.0.1
+nvidia-ml-py==13.590.48
