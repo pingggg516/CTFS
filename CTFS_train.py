@@ -16,13 +16,11 @@ import yaml
 
 from dataset.semi import SemiDataset
 from model.semseg.dpt import DPT
-from model.semseg.deeplabv3plus import DeepLabV3Plus
 from supervised import evaluate
 from util.classes import CLASSES
 from util.ohem import ProbOhemCrossEntropy2d
 from util.utils import count_params, init_log, AverageMeter
 
-from util.dist_helper import setup_distributed
 from util.monitor import PerformanceMonitor
 
 # 可靠性分数计算相关类 - 直接集成到主文件中
@@ -125,7 +123,7 @@ class CrossTeacherReliabilityValidator:
                         prob = torch.nn.functional.interpolate(
                             prob, size=(H, W), mode='bilinear', align_corners=False
                         )
-                else:  # sonar_a或sonar_b模式，散斑噪声和遮挡视图不需要几何还原
+                else:  # 阴影和能量衰减不改变几何位置，无需还原方位
                     pass
                 
                 augmented_predictions.append(prob)
@@ -365,11 +363,12 @@ def get_current_teacher_mode(epoch, warmup_epochs=15):
         return 'sonar_b'   # 声纳教师B：1个epoch
 
 
-parser = argparse.ArgumentParser(description='UniMatch V2: Pushing the Limit of Semi-Supervised Semantic Segmentation')
+parser = argparse.ArgumentParser(description='CTFS: single-GPU training with three EMA teachers')
 parser.add_argument('--config', type=str, required=True)
 parser.add_argument('--labeled-id-path', type=str, required=True)
 parser.add_argument('--unlabeled-id-path', type=str, required=True)
 parser.add_argument('--save-path', type=str, required=True)
+parser.add_argument('--resume', action='store_true', help='Resume from latest.pth in --save-path')
 parser.add_argument('--local_rank', '--local-rank', default=0, type=int)
 parser.add_argument('--port', default=None, type=int)
 
@@ -378,8 +377,12 @@ def main():
     args = parser.parse_args()
 
     cfg = yaml.safe_load(open(args.config, 'r'))
-    if os.path.exists(args.save_path):
-        raise FileExistsError('Use a new save directory; existing outputs are protected: ' + args.save_path)
+    resume_path = os.path.join(args.save_path, 'latest.pth')
+    if args.resume:
+        if not os.path.isfile(resume_path):
+            raise FileNotFoundError('Resume checkpoint not found: ' + resume_path)
+    elif os.path.exists(args.save_path):
+        raise FileExistsError('Use a new save directory, or pass --resume: ' + args.save_path)
 
     logger = init_log('global', logging.INFO)
     logger.propagate = 0
@@ -391,8 +394,10 @@ def main():
     # Add file handler to save logs to txt file
     if rank == 0:
         log_file_path = os.path.join(args.save_path, 'training.log')
-        os.makedirs(args.save_path, exist_ok=True)
-        file_handler = logging.FileHandler(log_file_path, mode='w', encoding='utf-8')
+        os.makedirs(args.save_path, exist_ok=args.resume)
+        file_handler = logging.FileHandler(
+            log_file_path, mode='a' if args.resume else 'w', encoding='utf-8'
+        )
         file_handler.setLevel(logging.INFO)
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(formatter)
@@ -423,11 +428,13 @@ def main():
             'giant': {'encoder_size': 'giant', 'features': 384, 'out_channels': [1536, 1536, 1536, 1536]}
         }
         model = DPT(**{**model_configs[cfg['backbone'].split('_')[-1]], 'nclass': cfg['nclass']})
-        state_dict = torch.load(cfg['pretrained_path'], map_location='cpu')
-        model.backbone.load_state_dict(state_dict)
-    elif cfg['model'] == 'deeplabv3plus':
-        # 使用 ResNet101 作为 DeepLabV3Plus 的主干网络
-        model = DeepLabV3Plus(nclass=cfg['nclass'], pretrained=True)
+        if not args.resume:
+            state_dict = torch.load(cfg['pretrained_path'], map_location='cpu')
+            model.backbone.load_state_dict(state_dict)
+    elif cfg['model'] in ('deeplabv3', 'deeplabv3plus'):
+        # The legacy module wraps torchvision DeepLabV3, not DeepLabV3+.
+        from model.semseg.deeplabv3plus import DeepLabV3Plus as DeepLabV3
+        model = DeepLabV3(nclass=cfg['nclass'], pretrained=not args.resume)
     else:
         raise NotImplementedError(f"Unsupported model '{cfg['model']}'")
         
@@ -520,8 +527,8 @@ def main():
     best_epoch, best_epoch_ema = 0, 0
     epoch = -1
     
-    if os.path.exists(os.path.join(args.save_path, 'latest.pth')):
-        checkpoint = torch.load(os.path.join(args.save_path, 'latest.pth'), map_location='cpu')
+    if args.resume:
+        checkpoint = torch.load(resume_path, map_location='cpu')
         model.load_state_dict(checkpoint['model'])
         
         # 加载三个教师模型，兼容旧版本checkpoint
@@ -603,8 +610,6 @@ def main():
         for i, ((img_x, mask_x),
                 (img_u_w_standard, img_u_w_sonar_a, img_u_w_sonar_b, img_u_s1, img_u_s2, ignore_mask, cutmix_box1, cutmix_box2)) in enumerate(loader):
             
-            iter_start_time = time.time()
-            
             img_x, mask_x = img_x.cuda(), mask_x.cuda()
             img_u_w_standard, img_u_w_sonar_a, img_u_w_sonar_b = img_u_w_standard.cuda(), img_u_w_sonar_a.cuda(), img_u_w_sonar_b.cuda()
             img_u_s1, img_u_s2 = img_u_s1.cuda(), img_u_s2.cuda()
@@ -655,14 +660,6 @@ def main():
             pred_x = model(img_x)
             pred_u_s1, pred_u_s2 = model(torch.cat((img_u_s1, img_u_s2)), comp_drop=False).chunk(2)
 
-            if rank == 0:
-                # Record inference speed (FPS)
-                # Batch size = labeled batch (img_x) + unlabeled batch (img_u_s1 + img_u_s2)
-                # Note: We are doing 3 forward passes: pred_x, pred_u_s1, pred_u_s2 (last two in one cat)
-                batch_size_total = img_x.shape[0] + img_u_s1.shape[0] + img_u_s2.shape[0]
-                iter_duration = time.time() - iter_start_time
-                monitor.record_inference_time(batch_size_total, iter_duration)
-            
             # Eq. 2: ignored/padded pixels have zero CE, with full-grid denominator.
             loss_x = criterion_l(pred_x, mask_x).mean()
             
@@ -842,6 +839,7 @@ def main():
                 writer.add_scalar('eval/%s_IoU_ema_sonar_b' % (CLASSES[cfg['dataset']][i]), iou_class_ema_sonar_b[i], epoch)
 
         is_best = mIoU >= previous_best
+        is_best_ema = mIoU_ema >= previous_best_ema
         
         previous_best = max(mIoU, previous_best)
         previous_best_ema = max(mIoU_ema, previous_best_ema)
@@ -863,11 +861,26 @@ def main():
                 'best_epoch': best_epoch,
                 'best_epoch_ema': best_epoch_ema,
                 'teacher_mode': teacher_mode,
-                'best_teacher': best_teacher
+                'best_teacher': best_teacher,
+                # All class scores below belong to this checkpoint's epoch.
+                'class_names': list(CLASSES[cfg['dataset']]),
+                'metrics': {
+                    'student': {'mIoU': float(mIoU), 'iou_class': iou_class.tolist()},
+                    'general': {'mIoU': float(mIoU_ema_general), 'iou_class': iou_class_ema_general.tolist()},
+                    'sonar_a': {'mIoU': float(mIoU_ema_sonar_a), 'iou_class': iou_class_ema_sonar_a.tolist()},
+                    'sonar_b': {'mIoU': float(mIoU_ema_sonar_b), 'iou_class': iou_class_ema_sonar_b.tolist()},
+                    'best_ema': {
+                        'teacher': best_teacher,
+                        'mIoU': float(mIoU_ema),
+                        'iou_class': iou_class_ema.tolist()
+                    }
+                }
             }
             torch.save(checkpoint, os.path.join(args.save_path, 'latest.pth'))
             if is_best:
                 torch.save(checkpoint, os.path.join(args.save_path, 'best.pth'))
+            if is_best_ema:
+                torch.save(checkpoint, os.path.join(args.save_path, 'best_ema.pth'))
         
         # 计算并打印epoch耗时
         epoch_end_time = time.time()
@@ -877,6 +890,9 @@ def main():
                 epoch, epoch_duration, epoch_duration / 60.0))
             monitor.end_epoch(epoch)
             monitor.log_performance_summary()
+
+    if rank == 0:
+        writer.close()
 
 
 if __name__ == '__main__':
