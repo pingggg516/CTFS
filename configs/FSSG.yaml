@@ -1,21 +1,25 @@
-# arguments for dataset
 dataset: FSSG
-nclass: 11 
-crop_size: 518
-data_root:   #Fill in the dataset root path
+data_root: /path/to/FSSG
+nclass: 11
 
+model: dpt
+backbone: dinov2_small
+pretrained_path: pretrained/dinov2_small.pth
+lock_backbone: false
 
-epochs: 240
-batch_size: 2
 lr: 0.000005
 lr_multi: 40.0
+
 criterion:
   name: CELoss
   kwargs:
     ignore_index: 255
-conf_thresh: 0.95
 
-# arguments for model
-model: dpt
-backbone: dinov2_small
-lock_backbone: False
+grid_size: 32
+reliability_threshold: 0.4
+lambda_u: 1.0
+warmup_epochs: 15
+
+epochs: 240
+batch_size: 2
+crop_size: 518
