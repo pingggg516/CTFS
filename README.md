@@ -27,53 +27,6 @@ Download the required DINOv2 pretrained backbone and place it under the `pretrai
     └── dinov2_large.pth
 ```
 
-## FSSG Dataset
-The FSSG dataset contains 3,761 forward-looking sonar images consisting of 11 targets(including background).Please download FSSG dataset [Here](https://pan.baidu.com/s/10qCqdCkPZ_o7hk7KlC74nw?pwd=0516) firstly.
-
-The dataset root should contain `Images/` and `Masks/` subdirectories.
-
-```bash
-├── /path/to/dataset_root/
-    ├── Images
-    │   ├── 00001.png
-    │   ├── 00002.png
-    │   └── ...
-    └── Masks
-        ├── 00001.png
-        ├── 00002.png
-        └── ...
-```
-
-Set the dataset root in `configs/FSSG.yaml`:
-
-```yaml
-data_root: /path/to/dataset_root
-```
-
-All split list files in this project should use the same line format:
-
-```text
-Images/xxx.png Masks/xxx.png
-```
-
-The paths in each line should be relative to `data_root`.
-
-
-### Class Definition
-* Class names and the corresponding pixel values in the labels are as follows:
-```text
-0: Background
-1: Block
-2: Circle Cage
-3: Steel Frame
-4: Concrete Column
-5: Steel Plate
-6: Pot
-7: SquareCage
-8: Tire
-9: Underwater Robot
-10: Diver
-```
 ### Usage Terms
 
 The FSSG dataset is publicly available for **non-commercial use only**.<br>
