@@ -27,6 +27,97 @@ Download the required DINOv2 pretrained backbone and place it under the `pretrai
     └── dinov2_large.pth
 ```
 
+## FSSG Dataset
+
+The FSSG dataset contains **3,761 forward-looking sonar images** with pixel-level semantic segmentation annotations, covering **10 target categories and 1 background class**.
+
+### Download
+
+Download the FSSG dataset from [Baidu Netdisk](https://pan.baidu.com/s/12Awtkr8GCzO2tiNnHp08Yw?pwd=0516).
+
+**Extraction code:** `0516`
+
+### Directory Structure
+
+Organize the sonar images and their corresponding segmentation masks as follows:
+
+```text
+FSSG/
+├── Images/
+│   ├── 00003.png
+│   ├── 00005.png
+│   └── ...
+└── Masks/
+    ├── 00003.png
+    ├── 00005.png
+    └── ...
+```
+
+- `Images/` contains the sonar images.
+- `Masks/` contains the corresponding PNG segmentation masks.
+- Each image and its mask should have the same filename and spatial dimensions. For example, `Images/00003.png` corresponds to `Masks/00003.png`.
+- Preserve the original filenames to match the provided split files.
+
+Set the dataset root in `configs/FSSG.yaml`:
+
+```yaml
+data_root: /path/to/FSSG
+nclass: 11
+```
+
+### Split Files
+
+Use the following format for the labeled, unlabeled and validation split files, with one image–mask pair per line:
+
+```text
+Images/00003.png Masks/00003.png
+Images/00005.png Masks/00005.png
+```
+
+Separate the two paths with a single space. Both paths are relative to `data_root`.
+
+Pass the training split files through `--labeled-id-path` and `--unlabeled-id-path`. The validation split is read from `splits/FSSG/val.txt`.
+
+### Mask Format and Class Definitions
+
+Each segmentation mask is a two-dimensional label map. The integer value at each pixel represents the semantic class of the corresponding image pixel.
+
+| Pixel Value / Class ID | Category |
+| :---: | --- |
+| 0 | Background |
+| 1 | Block |
+| 2 | Circle Cage |
+| 3 | Steel Frame |
+| 4 | Concrete Column |
+| 5 | Steel Plate |
+| 6 | Pot |
+| 7 | Square Cage |
+| 8 | Tire |
+| 9 | Underwater Robot |
+| 10 | Diver |
+
+For example, a mask pixel with value `8` belongs to **Tire**, while a pixel with value `10` belongs to **Diver**.
+
+Read the original class IDs using Pillow and NumPy:
+
+```python
+from PIL import Image
+import numpy as np
+
+mask = np.array(Image.open("/path/to/FSSG/Masks/00003.png"))
+
+print("Mask shape:", mask.shape)       # (H, W)
+print("Class IDs:", np.unique(mask))   # Classes present in this mask
+
+diver_region = (mask == 10)
+```
+
+Masks may appear nearly black when displayed as grayscale images because the class IDs range from `0` to `10`. A color palette can be applied for visualization.
+
+Keep the original integer class IDs when loading masks for training. Do not convert the label maps to RGB or normalize their values to `[0, 1]`. If resizing is required, use nearest-neighbor interpolation.
+
+The training configuration reserves `255` as the ignore value; it is not a semantic class.
+
 ### Usage Terms
 
 The FSSG dataset is publicly available for **non-commercial use only**.<br>
