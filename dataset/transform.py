@@ -172,64 +172,6 @@ def add_radial_noise(img, intensity=0.2, num_rays=8, p=0.5):
     return Image.fromarray(noisy_img)
 
 
-def add_irregular_occlusion(img, num_patches=2, min_size=15, max_size=40, p=0.6):
-    if random.random() > p:
-        return img
-
-    img_array = np.array(img)
-    if len(img_array.shape) == 3:
-        h, w, c = img_array.shape
-    else:
-        h, w = img_array.shape
-        c = 1
-
-    result = img_array.copy()
-
-    for _ in range(num_patches):
-
-        safe_max = min(max_size, (w - 1) // 2, (h - 1) // 2)
-        if safe_max < min_size:
-            return img
-
-        center_x = random.randint(safe_max, w - 1 - safe_max)
-        center_y = random.randint(safe_max, h - 1 - safe_max)
-        size = random.randint(min_size, safe_max)
-
-
-        a = random.randint(size//2, size)
-        b = random.randint(size//3, size//2)
-        angle = random.randint(0, 180)
-
-
-        y, x = np.ogrid[:h, :w]
-
-
-        cos_angle = np.cos(np.radians(angle))
-        sin_angle = np.sin(np.radians(angle))
-
-        x_rot = (x - center_x) * cos_angle + (y - center_y) * sin_angle
-        y_rot = -(x - center_x) * sin_angle + (y - center_y) * cos_angle
-
-
-        ellipse_mask = (x_rot**2 / a**2 + y_rot**2 / b**2) <= 1
-
-
-        occlusion_type = random.choice(['dark', 'bright', 'noise'])
-
-        if occlusion_type == 'dark':
-
-            result[ellipse_mask] = result[ellipse_mask] * 0.1
-        elif occlusion_type == 'bright':
-
-            result[ellipse_mask] = np.minimum(result[ellipse_mask] + 100, 255)
-        else:
-
-            noise_patch = np.random.randint(0, 255, result[ellipse_mask].shape)
-            result[ellipse_mask] = noise_patch
-
-    return Image.fromarray(result.astype(np.uint8))
-
-
 def add_acoustic_shadow(img, intensity=0.4, p=0.3):
     if random.random() > p:
         return img
@@ -276,33 +218,3 @@ def add_acoustic_shadow(img, intensity=0.4, p=0.3):
             result[shadow_mask] = result[shadow_mask] * (1 - shadow_intensity[shadow_mask])
 
     return Image.fromarray(result.astype(np.uint8))
-
-
-def sonar_strong_augmentation(img):
-
-    img = add_speckle_noise(img, intensity=random.uniform(0.12, 0.15), p=1.0)
-
-
-    img = add_radial_noise(img,
-                          intensity=random.uniform(0.1, 0.3),
-                          num_rays=random.randint(6, 16),
-                          p=0.5)
-
-
-    img = add_acoustic_shadow(img,
-                             intensity=random.uniform(0.2, 0.5),
-                             p=0.3)
-
-
-    img = add_irregular_occlusion(img,
-                                 num_patches=random.randint(1, 3),
-                                 min_size=10,
-                                 max_size=35,
-                                 p=0.6)
-
-
-    img = apply_distance_attenuation(img,
-                                   attenuation_factor=random.uniform(0.3, 0.6),
-                                   p=0.4)
-
-    return img

@@ -431,10 +431,6 @@ def main():
         if not args.resume:
             state_dict = torch.load(cfg['pretrained_path'], map_location='cpu')
             model.backbone.load_state_dict(state_dict)
-    elif cfg['model'] in ('deeplabv3', 'deeplabv3plus'):
-        # The legacy module wraps torchvision DeepLabV3, not DeepLabV3+.
-        from model.semseg.deeplabv3plus import DeepLabV3Plus as DeepLabV3
-        model = DeepLabV3(nclass=cfg['nclass'], pretrained=not args.resume)
     else:
         raise NotImplementedError(f"Unsupported model '{cfg['model']}'")
         

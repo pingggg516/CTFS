@@ -35,7 +35,7 @@ parser.add_argument('--port', default=None, type=int)
 
 def evaluate(model, loader, mode, cfg, multiplier=None):
     model.eval()
-    assert mode in ['original', 'center_crop', 'sliding_window']
+    assert mode in ['original', 'sliding_window']
     intersection_meter = AverageMeter()
     union_meter = AverageMeter()
 
@@ -127,6 +127,8 @@ def main():
     args = parser.parse_args()
 
     cfg = yaml.load(open(args.config, "r"), Loader=yaml.Loader)
+    resume_path = os.path.join(args.save_path, 'latest.pth')
+    resume_training = os.path.isfile(resume_path)
 
     logger = init_log('global', logging.INFO)
     logger.propagate = 0
@@ -138,7 +140,7 @@ def main():
     if rank == 0:
         log_file_path = os.path.join(args.save_path, 'training.log')
         os.makedirs(args.save_path, exist_ok=True)
-        file_handler = logging.FileHandler(log_file_path, mode='w', encoding='utf-8')
+        file_handler = logging.FileHandler(log_file_path, mode='a', encoding='utf-8')
         file_handler.setLevel(logging.INFO)
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(formatter)
@@ -165,8 +167,13 @@ def main():
     }
     model = DPT(**{**model_configs[cfg['backbone'].split('_')[-1]], 'nclass': cfg['nclass']})
 
-    state_dict = torch.load(f'./pretrained/{cfg["backbone"]}.pth')
-    model.backbone.load_state_dict(state_dict)
+    if not resume_training:
+        pretrained_path = (
+            args.pretrained_path or cfg.get('pretrained_path')
+            or f'./pretrained/{cfg["backbone"]}.pth'
+        )
+        state_dict = torch.load(pretrained_path, map_location='cpu')
+        model.backbone.load_state_dict(state_dict)
 
     if cfg['lock_backbone']:
         model.lock_backbone()
@@ -197,6 +204,7 @@ def main():
         raise NotImplementedError('%s criterion is not implemented' % cfg['criterion']['name'])
 
     n_upsampled = {
+        'FSSG': 3000,
         'pascal': 3000,
         'cityscapes': 3000,
         'ade20k': 6000,
@@ -224,8 +232,8 @@ def main():
     previous_best = 0.0
     epoch = -1
 
-    if os.path.exists(os.path.join(args.save_path, 'latest.pth')):
-        checkpoint = torch.load(os.path.join(args.save_path, 'latest.pth'), map_location='cpu')
+    if resume_training:
+        checkpoint = torch.load(resume_path, map_location='cpu')
         model.load_state_dict(checkpoint['model'])
         optimizer.load_state_dict(checkpoint['optimizer'])
         epoch = checkpoint['epoch']
