@@ -21,5 +21,5 @@ lambda_u: 1.0
 warmup_epochs: 15
 
 epochs: 240
-batch_size: 2
+batch_size: 4
 crop_size: 518

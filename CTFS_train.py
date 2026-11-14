@@ -654,7 +654,8 @@ def main():
             img_u_s2[cutmix_box2.unsqueeze(1).expand(img_u_s2.shape) == 1] = img_u_s2.flip(0)[cutmix_box2.unsqueeze(1).expand(img_u_s2.shape) == 1]
             
             pred_x = model(img_x)
-            pred_u_s1, pred_u_s2 = model(torch.cat((img_u_s1, img_u_s2)), comp_drop=False).chunk(2)
+            if teacher_mode != 'supervised':
+                pred_u_s1, pred_u_s2 = model(torch.cat((img_u_s1, img_u_s2)), comp_drop=False).chunk(2)
 
             # Eq. 2: ignored/padded pixels have zero CE, with full-grid denominator.
             loss_x = criterion_l(pred_x, mask_x).mean()
