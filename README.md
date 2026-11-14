@@ -1,3 +1,4 @@
+
 # CTFS
 
 CTFS: Collaborative Teacher Framework for Forward-Looking Sonar Image Semantic Segmentation with Extremely Limited Labels.
@@ -27,13 +28,27 @@ Download the required DINOv2 pretrained backbone and place it under the `pretrai
     └── dinov2_large.pth
 ```
 
-## FSSG Dataset
+## FSSGv2 Dataset
 
-The FSSG dataset contains **3,761 forward-looking sonar images** with pixel-level semantic segmentation annotations, covering **10 target categories and 1 background class**.
+The FSSGv2 dataset contains **3,761 forward-looking sonar images** with pixel-level semantic segmentation annotations, covering **10 target categories and 1 background class**.
+
+### Note on FSSGv2
+
+The dataset released at the link below has remained unchanged since its initial release. However, it differs from the version used in our paper: we corrected some inaccurate annotations before the release but forgot to mention this at that time. To make this clear, we now name the released dataset **FSSGv2**. If you have already downloaded it and evaluated other comparison methods on it, those results remain valid and can continue to be used.
+
+To facilitate comparison, we retrained CTFS on FSSGv2 with 2%, 5% and 10% labeled data. The corresponding labeled and unlabeled splits, together with `val.txt` and `test.txt`, are provided in `splits/FSSG/`. The weights, training logs and test logs are available from [Baidu Netdisk](https://pan.baidu.com/s/1noKbhy4ZcnHFju1bn46h_A?pwd=0516) (extraction code: `0516`).
+
+| Labeled ratio | Val mIoU | Test mIoU |
+| :---: | :---: | :---: |
+| 2% | 56.24 | 56.36 |
+| 5% | 61.32 | 61.89 |
+| 10% | 63.56 | 63.93 |
+
+All runs use a batch size of 4, and the 2% setting uses a learning rate of `2.5e-6`. The other hyperparameters have not been tuned for FSSGv2, and the full configuration of each run is recorded in its training log, so further tuning may lead to better results. We sincerely apologize for any inconvenience, and please feel free to contact us if you have any questions.
 
 ### Download
 
-Download the FSSG dataset from [Baidu Netdisk](https://pan.baidu.com/s/12Awtkr8GCzO2tiNnHp08Yw?pwd=0516).
+Download the FSSGv2 dataset from [Baidu Netdisk](https://pan.baidu.com/s/12Awtkr8GCzO2tiNnHp08Yw?pwd=0516).
 
 **Extraction code:** `0516`
 
@@ -65,18 +80,12 @@ data_root: /path/to/FSSG
 nclass: 11
 ```
 
-### Split Files
-
-Use the following format for the labeled, unlabeled and validation split files, with one image–mask pair per line:
+Each line of a split file contains one image–mask pair, separated by a single space, with both paths relative to `data_root`:
 
 ```text
 Images/00003.png Masks/00003.png
 Images/00005.png Masks/00005.png
 ```
-
-Separate the two paths with a single space. Both paths are relative to `data_root`.
-
-Pass the training split files through `--labeled-id-path` and `--unlabeled-id-path`. The validation split is read from `splits/FSSG/val.txt`.
 
 ### Mask Format and Class Definitions
 
@@ -114,28 +123,37 @@ diver_region = (mask == 10)
 
 Masks may appear nearly black when displayed as grayscale images because the class IDs range from `0` to `10`. A color palette can be applied for visualization.
 
-Keep the original integer class IDs when loading masks for training. Do not convert the label maps to RGB or normalize their values to `[0, 1]`. If resizing is required, use nearest-neighbor interpolation.
-
-The training configuration reserves `255` as the ignore value; it is not a semantic class.
 
 ### Usage Terms
 
-The FSSG dataset is publicly available for **non-commercial use only**.<br>
+The FSSGv2 dataset is publicly available for **non-commercial use only**.<br>
 
 If you use this dataset, please **cite our paper** and **acknowledge this repository as the dataset source** in any resulting publications or research outputs.
 
 ## Training
 
-Run single-GPU training with:
+Run single-GPU training with the following command. The validation split is read from `splits/FSSG/val.txt`.
 
 ```bash
-# --labeled-id-path: Fill in the file path
-# --unlabeled-id-path: Fill in the file path
 python CTFS_train.py \
   --config configs/FSSG.yaml \
-  --labeled-id-path /path/to/labeled.txt \
-  --unlabeled-id-path /path/to/unlabeled.txt \
+  --labeled-id-path splits/FSSG/labeled_10.txt \
+  --unlabeled-id-path splits/FSSG/unlabeled_10.txt \
   --save-path ./exp/CTFS/<experiment_name>
+```
+
+## Inference
+
+Use `inference.py` to run a trained CTFS model, either the released weights or a checkpoint from your own training (e.g. `best.pth`). To predict an image or a directory of images, run the command below; class-ID masks are saved to `outputs/mask/` and color visualizations to `outputs/color/`.
+
+```bash
+python inference.py --weights /path/to/weights.pth --input /path/to/images --output outputs
+```
+
+To evaluate a trained model on the test set:
+
+```bash
+python inference.py --weights /path/to/weights.pth --data-root /path/to/FSSGv2 --eval-split splits/FSSG/test.txt
 ```
 
 ## Notes
@@ -165,4 +183,3 @@ If you find this project useful, please consider citing:
     pages     = {1660-1669}
 }
 ```
-
