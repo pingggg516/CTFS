@@ -57,7 +57,7 @@ Download the FSSGv2 dataset from [Baidu Netdisk](https://pan.baidu.com/s/12Awtkr
 Organize the sonar images and their corresponding segmentation masks as follows:
 
 ```text
-FSSG/
+FSSGv2/
 ├── Images/
 │   ├── 00003.png
 │   ├── 00005.png
@@ -76,7 +76,7 @@ FSSG/
 Set the dataset root in `configs/FSSG.yaml`:
 
 ```yaml
-data_root: /path/to/FSSG
+data_root: /path/to/FSSGv2
 nclass: 11
 ```
 
@@ -113,7 +113,7 @@ Read the original class IDs using Pillow and NumPy:
 from PIL import Image
 import numpy as np
 
-mask = np.array(Image.open("/path/to/FSSG/Masks/00003.png"))
+mask = np.array(Image.open("/path/to/FSSGv2/Masks/00003.png"))
 
 print("Mask shape:", mask.shape)       # (H, W)
 print("Class IDs:", np.unique(mask))   # Classes present in this mask
